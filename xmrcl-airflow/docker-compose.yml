@@ -1,7 +1,7 @@
 services:
   app_proxy:
     environment:
-      APP_HOST: airflow_webserver_1
+      APP_HOST: xmrcl-airflow_webserver_1
       APP_PORT: 8080
   postgres:
     image: postgres:13
