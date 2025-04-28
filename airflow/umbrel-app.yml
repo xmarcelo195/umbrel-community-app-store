@@ -1,0 +1,18 @@
+id: "airflow"
+name: "Apache Airflow"
+version: "3.0.0"
+releaseNotes: "Initial release of Apache Airflow for Umbrel."
+license: "Apache-2.0"
+repository: "https://github.com/xmarcelo195/umbrel-airflow"
+description: "Apache Airflow is a platform to programmatically author, schedule, and monitor workflows."
+developer:
+  name: "Your Name"
+  email: "you@example.com"
+  website: "https://yourwebsite.com"
+dependencies: []
+path: ""
+defaultUsername: "admin"
+defaultPassword: "nR25kZzeNRPpUsqZ"
+icon: "gallery/icon.png"
+
+

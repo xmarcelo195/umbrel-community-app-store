@@ -1,0 +1,55 @@
+services:
+  app_proxy:
+    environment:
+      APP_HOST: airflow_webserver_1
+      APP_PORT: 8080
+  postgres:
+    image: postgres:13
+    restart: on-failure
+    stop_grace_period: 1m
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - ${APP_DATA_DIR}/postgres:/var/lib/postgresql/data
+
+  webserver:
+    image: apache/airflow:3.0.0
+    restart: on-failure
+    stop_grace_period: 1m
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__FERNET_KEY: ${APP_AIRFLOW_FERNET_KEY}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "true"
+      AIRFLOW__WEBSERVER__AUTH_BACKEND: airflow.www.auth.basic_auth
+    volumes:
+      - ${APP_DATA_DIR}/dags:/opt/airflow/dags
+      - ${APP_DATA_DIR}/logs:/opt/airflow/logs
+      - ${APP_DATA_DIR}/plugins:/opt/airflow/plugins
+    command: bash -c "
+      airflow db migrate &&
+      airflow api-server
+      "
+    ports:
+      - "8080:8080"
+
+  scheduler:
+    image: apache/airflow:3.0.0
+    restart: on-failure
+    stop_grace_period: 1m
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__FERNET_KEY: ${APP_AIRFLOW_FERNET_KEY}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "true"
+    volumes:
+      - ${APP_DATA_DIR}/dags:/opt/airflow/dags
+      - ${APP_DATA_DIR}/logs:/opt/airflow/logs
+      - ${APP_DATA_DIR}/plugins:/opt/airflow/plugins
+    command: scheduler
