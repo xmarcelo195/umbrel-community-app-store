@@ -1,18 +1,30 @@
+manifestVersion: 1
 id: "xmrcl-airflow"
 name: "Apache Airflow"
-version: "3.0.0"
-releaseNotes: "Initial release of Apache Airflow for Umbrel."
-license: "Apache-2.0"
-repository: "https://github.com/xmarcelo195/umbrel-airflow"
-description: "Apache Airflow is a platform to programmatically author, schedule, and monitor workflows."
-developer:
-  name: "Your Name"
-  email: "you@example.com"
-  website: "https://yourwebsite.com"
+tagline: Replace this tagline with your app's tagline
+icon: https://svgur.com/i/mvA.svg
+category: Development
+version: "1.0.0"
+port: 4000
+description: >-
+  Add your app's description here.
+
+
+  You can also add newlines!
+
+developer: Umbrel
+website: https://umbrel.com
+submitter: Umbrel
+submission: https://github.com/getumbrel/umbrel-hello-world-app
+repo: https://github.com/getumbrel/umbrel-hello-world-app
+support: https://github.com/getumbrel/umbrel-hello-world-app/issues
+gallery:
+  - https://airflow.apache.org/docs/apache-airflow/2.1.0/_images/dags.png
+  - https://airflow.apache.org/docs/apache-airflow/2.1.0/_images/tree.png
+  - https://airflow.apache.org/docs/apache-airflow/2.1.0/_images/graph.png
+releaseNotes: >-
+  Add what's new in the latest version of your app here.
 dependencies: []
 path: ""
 defaultUsername: "admin"
 defaultPassword: "nR25kZzeNRPpUsqZ"
-icon: "gallery/icon.png"
-
-
