@@ -1,4 +1,4 @@
-id: "airflow"
+id: "xmrcl-airflow"
 name: "Apache Airflow"
 version: "3.0.0"
 releaseNotes: "Initial release of Apache Airflow for Umbrel."
