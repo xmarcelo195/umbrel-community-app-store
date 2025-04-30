@@ -25,9 +25,9 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__FERNET_KEY: ${APP_AIRFLOW_FERNET_KEY}
-      AIRFLOW__CORE__LOAD_EXAMPLES: "true"
-      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "True"
-      AIRFLOW__WEBSERVER__AUTH_BACKEND: airflow.www.auth.basic_auth
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__WEBSERVER__RBAC: "True"
+      AIRFLOW__WEBSERVER__AUTH_BACKENDS: airflow.www.security.DefaultUserOAuth
     volumes:
       - ${APP_DATA_DIR}/dags:/opt/airflow/dags
       - ${APP_DATA_DIR}/logs:/opt/airflow/logs
