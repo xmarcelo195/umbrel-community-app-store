@@ -1,22 +1,21 @@
-version: '3.8'
+version: "3.8"
 
 services:
   airflow:
     image: apache/airflow:3.0.0
-    restart: on-failure
+    container_name: airflow
+    restart: always
     environment:
-      # Chave Fernet para criptografia de conexões e XComs
-      AIRFLOW__CORE__FERNET_KEY: ${APP_AIRFLOW_FERNET_KEY}
-      # Desativa exemplos padrão
+      AIRFLOW_HOME: /opt/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-      # Define o executor local (single-node)
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__FERNET_KEY: ${APP_AIRFLOW_FERNET_KEY}
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+    command: standalone
+    ports:
+      - "8081:8080"
     volumes:
-      # Mapeia diretórios de dags, logs e plugins
       - ${APP_DATA_DIR}/dags:/opt/airflow/dags
       - ${APP_DATA_DIR}/logs:/opt/airflow/logs
       - ${APP_DATA_DIR}/plugins:/opt/airflow/plugins
-    command: >
-      bash -c "airflow standalone"
-    ports:
-      - "8081:8080"
+      - ${APP_DATA_DIR}/db:/opt/airflow/standalone_admin.db
