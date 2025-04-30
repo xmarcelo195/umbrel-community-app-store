@@ -1,57 +1,71 @@
-version: "3.7"
+version: '3.8'
+
 services:
-  app_proxy:
-    environment:
-      APP_HOST: xmrcl-airflow_webserver_1
-      APP_PORT: 8080
   postgres:
-    image: postgres:13
-    restart: on-failure
-    stop_grace_period: 1m
+    image: postgres:15
     environment:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
     volumes:
-      - ${APP_DATA_DIR}/postgres:/var/lib/postgresql/data
+      - postgres-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+
+  airflow-init:
+    image: apache/airflow:3.0.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: >
+      bash -c "
+        airflow db init &&
+        airflow users create \
+          -u airflow -p airflow \
+          -r Admin -f Admin -l User -e airflow@example.com
+      "
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
 
   webserver:
     image: apache/airflow:3.0.0
     restart: on-failure
-    stop_grace_period: 1m
     depends_on:
-      - postgres
+      airflow-init:
+        condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__FERNET_KEY: ${APP_AIRFLOW_FERNET_KEY}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__WEBSERVER__RBAC: "True"
-      AIRFLOW__WEBSERVER__AUTH_BACKENDS: airflow.www.security.DefaultUserOAuth
+      AIRFLOW__WEBSERVER__AUTH_BACKENDS: airflow.www.security.DefaultAuthBackend
     volumes:
-      - ${APP_DATA_DIR}/dags:/opt/airflow/dags
-      - ${APP_DATA_DIR}/logs:/opt/airflow/logs
-      - ${APP_DATA_DIR}/plugins:/opt/airflow/plugins
-    command: bash -c "
-      airflow db migrate &&
-      airflow api-server
-      "
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    command: airflow webserver
     ports:
-      - "8080:8080"
+      - "8081:8080"
 
   scheduler:
     image: apache/airflow:3.0.0
     restart: on-failure
-    stop_grace_period: 1m
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-      AIRFLOW__CORE__FERNET_KEY: ${APP_AIRFLOW_FERNET_KEY}
-      AIRFLOW__CORE__LOAD_EXAMPLES: "true"
     volumes:
-      - ${APP_DATA_DIR}/dags:/opt/airflow/dags
-      - ${APP_DATA_DIR}/logs:/opt/airflow/logs
-      - ${APP_DATA_DIR}/plugins:/opt/airflow/plugins
-    command: scheduler
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    command: airflow scheduler
+
+volumes:
+  postgres-db:
