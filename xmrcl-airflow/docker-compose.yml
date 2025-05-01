@@ -25,6 +25,7 @@ services:
       - ${APP_DATA_DIR}/dags:/opt/airflow/dags
       - ${APP_DATA_DIR}/logs:/opt/airflow/logs
       - ${APP_DATA_DIR}/plugins:/opt/airflow/plugins
+      - ${APP_DATA_DIR}/scripts:/opt/airflow/scripts
     ports:
       - "8081:8080"
     command: >
